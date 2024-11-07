@@ -5,14 +5,13 @@ package riblt
 // prefix incrementally using an Encoder, it is more efficient to use Sketch.
 // Sketch also allows inserting or deleting source symbols from the set after
 // it has been created.
-type Sketch[T Symbol[T]] []CodedSymbol[T]
+type Sketch []CodedSymbol
 
 // AddHashedSymbol inserts source symbol t to the set of which s is a sketch.
-func (s Sketch[T]) AddHashedSymbol(t HashedSymbol[T]) {
+func (s Sketch) AddHashedSymbol(t HashedSymbol) {
 	m := randomMapping{t.Hash, 0}
 	for int(m.lastIdx) < len(s) {
 		idx := m.lastIdx
-		s[idx].Symbol = s[idx].Symbol.XOR(t.Symbol)
 		s[idx].Count += 1
 		s[idx].Hash ^= t.Hash
 		m.nextIndex()
@@ -21,11 +20,10 @@ func (s Sketch[T]) AddHashedSymbol(t HashedSymbol[T]) {
 
 // RemoveHashedSymbol deletes source symbol t from the set of which s is a
 // sketch.
-func (s Sketch[T]) RemoveHashedSymbol(t HashedSymbol[T]) {
+func (s Sketch) RemoveHashedSymbol(t HashedSymbol) {
 	m := randomMapping{t.Hash, 0}
 	for int(m.lastIdx) < len(s) {
 		idx := m.lastIdx
-		s[idx].Symbol = s[idx].Symbol.XOR(t.Symbol)
 		s[idx].Count -= 1
 		s[idx].Hash ^= t.Hash
 		m.nextIndex()
@@ -33,27 +31,26 @@ func (s Sketch[T]) RemoveHashedSymbol(t HashedSymbol[T]) {
 }
 
 // AddSymbol inserts source symbol t to the set of which s is a sketch.
-func (s Sketch[T]) AddSymbol(t T) {
-	hs := HashedSymbol[T]{t, t.Hash()}
+func (s Sketch) AddSymbol(t HashType) {
+	hs := HashedSymbol{t}
 	s.AddHashedSymbol(hs)
 }
 
 // RemoveSymbol deletes source symbol t from the set of which s is a sketch.
-func (s Sketch[T]) RemoveSymbol(t T) {
-	hs := HashedSymbol[T]{t, t.Hash()}
+func (s Sketch) RemoveSymbol(t HashType) {
+	hs := HashedSymbol{t}
 	s.RemoveHashedSymbol(hs)
 }
 
 // Subtract subtracts s2 from s by modifying s in place. s and s2 must be of
 // equal length. If s is a sketch of set S and s2 is a sketch of set S2, then
 // the result is a sketch of the symmetric difference between S and S2.
-func (s Sketch[T]) Subtract(s2 Sketch[T]) {
+func (s Sketch) Subtract(s2 Sketch) {
 	if len(s) != len(s2) {
 		panic("subtracting sketches of different sizes")
 	}
 
 	for i := range s {
-		s[i].Symbol = s[i].Symbol.XOR(s2[i].Symbol)
 		s[i].Count = s[i].Count - s2[i].Count
 		s[i].Hash ^= s2[i].Hash
 	}
@@ -68,8 +65,8 @@ func (s Sketch[T]) Subtract(s2 Sketch[T]) {
 // When successful, indicated by succ being true, fwd contains all source
 // symbols in S in case 1, or S \ S2 in case 2 (\ is the set subtraction
 // operation). rev is empty in case 1, or S2 \ S in case 2.
-func (s Sketch[T]) Decode() (fwd []HashType, rev []HashType, succ bool) {
-	dec := Decoder[T]{}
+func (s Sketch) Decode() (fwd []HashType, rev []HashType, succ bool) {
+	dec := Decoder{}
 	for _, c := range s {
 		dec.AddCodedSymbol(c)
 	}

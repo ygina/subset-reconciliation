@@ -32,14 +32,14 @@ func Example() {
 	bob := []item{1, 3, 4, 5, 6, 7, 8, 9, 10}  // Bob has a subset of Alice
 
 	// Alice creates an encoder and gives it her set.
-	enc := riblt.Encoder[item]{}
+	enc := riblt.Encoder{}
 	for _, v := range alice {
-		enc.AddSymbol(v)
+		enc.AddSymbol(v.Hash())
 	}
 	// Bob creates a decoder and gives it his set.
-	dec := riblt.Decoder[item]{}
+	dec := riblt.Decoder{}
 	for _, v := range bob {
-		dec.AddSymbol(v)
+		dec.AddSymbol(v.Hash())
 	}
 
 	cost := 0

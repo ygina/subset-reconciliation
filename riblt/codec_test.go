@@ -55,24 +55,24 @@ func BenchmarkEncodeAndDecode(bc *testing.B) {
 			b.ResetTimer()
 			b.StopTimer()
 			for iter := 0; iter < b.N; iter++ {
-				enc := Encoder[testSymbol]{}
-				dec := Decoder[testSymbol]{}
+				enc := Encoder{}
+				dec := Decoder{}
 
 				for i := 0; i < nlocal; i++ {
 					s := newTestSymbol(nextId)
 					nextId += 1
-					dec.AddSymbol(s)
+					dec.AddSymbol(s.Hash())
 				}
 				for i := 0; i < nremote; i++ {
 					s := newTestSymbol(nextId)
 					nextId += 1
-					enc.AddSymbol(s)
+					enc.AddSymbol(s.Hash())
 				}
 				for i := 0; i < ncommon; i++ {
 					s := newTestSymbol(nextId)
 					nextId += 1
-					enc.AddSymbol(s)
-					dec.AddSymbol(s)
+					enc.AddSymbol(s.Hash())
+					dec.AddSymbol(s.Hash())
 				}
 				b.StartTimer()
 				for {
@@ -91,8 +91,8 @@ func BenchmarkEncodeAndDecode(bc *testing.B) {
 }
 
 func TestEncodeAndDecode(t *testing.T) {
-	enc := Encoder[testSymbol]{}
-	dec := Decoder[testSymbol]{}
+	enc := Encoder{}
+	dec := Decoder{}
 	local := make(map[uint64]struct{})
 	remote := make(map[uint64]struct{})
 
@@ -103,20 +103,20 @@ func TestEncodeAndDecode(t *testing.T) {
 	for i := 0; i < nlocal; i++ {
 		s := newTestSymbol(nextId)
 		nextId += 1
-		dec.AddSymbol(s)
+		dec.AddSymbol(s.Hash())
 		local[s.Hash()] = struct{}{}
 	}
 	for i := 0; i < nremote; i++ {
 		s := newTestSymbol(nextId)
 		nextId += 1
-		enc.AddSymbol(s)
+		enc.AddSymbol(s.Hash())
 		remote[s.Hash()] = struct{}{}
 	}
 	for i := 0; i < ncommon; i++ {
 		s := newTestSymbol(nextId)
 		nextId += 1
-		enc.AddSymbol(s)
-		dec.AddSymbol(s)
+		enc.AddSymbol(s.Hash())
+		dec.AddSymbol(s.Hash())
 	}
 
 	ncw := 0

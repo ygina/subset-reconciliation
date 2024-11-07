@@ -12,8 +12,7 @@ type Decoder[T Symbol[T]] struct {
 	// set of source symbols that are exclusive to the encoder
 	remote codingWindow[T]
 	// indices of coded symbols that can be decoded, i.e., degree equal to -1
-	// or 1 and sum of hash equal to hash of sum, or degree equal to 0 and sum
-	// of hash equal to 0
+	// or 1 or degree equal to 0 and sum of hash equal to 0
 	decodable []int
 	// number of coded symbols that are decoded
 	decoded int
@@ -69,7 +68,7 @@ func (d *Decoder[T]) AddCodedSymbol(c CodedSymbol[T]) {
 	// insert the new coded symbol
 	d.cs = append(d.cs, c)
 	// check if the coded symbol is decodable, and insert into decodable list if so
-	if (c.Count == 1 || c.Count == -1) && (c.Hash == c.Symbol.Hash()) {
+	if c.Count == 1 || c.Count == -1 {
 		d.decodable = append(d.decodable, len(d.cs)-1)
 	} else if c.Count == 0 && c.Hash == 0 {
 		d.decodable = append(d.decodable, len(d.cs)-1)
@@ -101,7 +100,7 @@ func (d *Decoder[T]) applyNewSymbol(t HashedSymbol[T], direction int64) randomMa
 		// duplicates. On the other hand, it is fine that we insert all
 		// degree-1 or -1 decodable symbols, because we only see them in such
 		// state once.
-		if (d.cs[cidx].Count == -1 || d.cs[cidx].Count == 1) && d.cs[cidx].Hash == d.cs[cidx].Symbol.Hash() {
+		if d.cs[cidx].Count == -1 || d.cs[cidx].Count == 1 {
 			d.decodable = append(d.decodable, cidx)
 		}
 		m.nextIndex()

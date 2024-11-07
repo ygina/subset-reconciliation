@@ -29,6 +29,8 @@
 // example.
 package riblt
 
+type HashType = uint64
+
 // Symbol is the interface that source symbols (set elements being reconciled)
 // should implement. It specifies a Boolean group, where type T (or its subset)
 // is the underlying set, and $ is the group operation. It should satisfy the
@@ -54,14 +56,14 @@ type Symbol[T any] interface {
 	//   (a $ b).Hash() == a.Hash() ^ b.Hash()
 	// must be negligible. Here, ^ on the right-hand side is the bitwise
 	// exclusive-or operation.
-	Hash() uint64
+	Hash() HashType
 }
 
 // HashedSymbol is the bundle of a symbol and its hash computed using its Hash
 // method.
 type HashedSymbol[T Symbol[T]] struct {
 	Symbol T
-	Hash   uint64
+	Hash   HashType
 }
 
 // CodedSymbol is a coded symbol produced by a Rateless IBLT encoder.

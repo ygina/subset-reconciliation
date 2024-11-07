@@ -20,7 +20,7 @@ func (d testSymbol) XOR(t2 testSymbol) testSymbol {
 	return d
 }
 
-func (d testSymbol) Hash() uint64 {
+func (d testSymbol) Hash() HashType {
 	return siphash.Hash(567, 890, d[:])
 }
 
@@ -129,10 +129,10 @@ func TestEncodeAndDecode(t *testing.T) {
 		}
 	}
 	for _, v := range dec.Remote() {
-		delete(remote, v.Hash)
+		delete(remote, v)
 	}
 	for _, v := range dec.Local() {
-		delete(local, v.Hash)
+		delete(local, v)
 	}
 	if len(remote) != 0 || len(local) != 0 {
 		t.Errorf("missing symbols: %d remote and %d local", len(remote), len(local))

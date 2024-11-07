@@ -26,13 +26,21 @@ func (d *Decoder[T]) Decoded() bool {
 }
 
 // Local returns the list of source symbols that are present in B but not in A.
-func (d *Decoder[T]) Local() []HashedSymbol[T] {
-	return d.local.symbols
+func (d *Decoder[T]) Local() []HashType {
+	hashes := make([]HashType, len(d.local.symbols))
+	for i, v := range d.local.symbols {
+		hashes[i] = v.Hash
+	}
+	return hashes
 }
 
 // Remote returns the list of source symbols that are present in A but not in B.
-func (d *Decoder[T]) Remote() []HashedSymbol[T] {
-	return d.remote.symbols
+func (d *Decoder[T]) Remote() []HashType {
+	hashes := make([]HashType, len(d.remote.symbols))
+	for i, v := range d.remote.symbols {
+		hashes[i] = v.Hash
+	}
+	return hashes
 }
 
 // AddSymbol adds a source symbol to B, the Decoder's local set. It is

@@ -68,7 +68,7 @@ func (s Sketch[T]) Subtract(s2 Sketch[T]) {
 // When successful, indicated by succ being true, fwd contains all source
 // symbols in S in case 1, or S \ S2 in case 2 (\ is the set subtraction
 // operation). rev is empty in case 1, or S2 \ S in case 2.
-func (s Sketch[T]) Decode() (fwd []HashedSymbol[T], rev []HashedSymbol[T], succ bool) {
+func (s Sketch[T]) Decode() (fwd []HashType, rev []HashType, succ bool) {
 	dec := Decoder[T]{}
 	for _, c := range s {
 		dec.AddCodedSymbol(c)

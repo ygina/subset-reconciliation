@@ -28,8 +28,8 @@ func Example() {
 	// Alice and Bob each holds a set of items. Bob wishes to know the items
 	// that Alice has but he does not, as well as items that he has but Alice
 	// does not. Their sets are mostly the same.
-	alice := []item{1, 2, 3, 4, 5, 6, 7, 8, 9, 10} // only Alice has 2
-	bob := []item{1, 3, 4, 5, 6, 7, 8, 9, 10, 11}  // only Bob has 11
+	alice := []item{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11} // only Alice has 2 and 11
+	bob := []item{1, 3, 4, 5, 6, 7, 8, 9, 10}  // Bob has a subset of Alice
 
 	// Alice creates an encoder and gives it her set.
 	enc := riblt.Encoder[item]{}
@@ -55,11 +55,11 @@ func Example() {
 		}
 	}
 
-	fmt.Println(dec.Remote()[0].Symbol, "is exclusive to Alice")
-	fmt.Println(dec.Local()[0].Symbol, "is exclusive to Bob")
+	fmt.Println(len(dec.Remote()), "elements exclusive to Alice")
+	fmt.Println(len(dec.Local()), "elements exclusive to Bob")
 	fmt.Println(cost, "coded symbols sent")
 	// Output:
-	// 2 is exclusive to Alice
-	// 11 is exclusive to Bob
+	// 2 elements exclusive to Alice
+	// 0 elements exclusive to Bob
 	// 2 coded symbols sent
 }

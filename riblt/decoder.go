@@ -125,12 +125,7 @@ func (d *Decoder[T]) TryDecode() {
 			d.remote.addHashedSymbolWithMapping(ns, m)
 			d.decoded += 1
 		case -1:
-			ns := HashedSymbol[T]{}
-			ns.Symbol = ns.Symbol.XOR(c.Symbol)
-			ns.Hash = c.Hash
-			m := d.applyNewSymbol(ns, add)
-			d.local.addHashedSymbolWithMapping(ns, m)
-			d.decoded += 1
+			panic("only handle subset reconciliation")
 		case 0:
 			d.decoded += 1
 		default:

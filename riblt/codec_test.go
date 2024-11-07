@@ -47,8 +47,8 @@ func BenchmarkEncodeAndDecode(bc *testing.B) {
 	for _, tc := range cases {
 		bc.Run(tc.name, func(b *testing.B) {
 			b.SetBytes(testSymbolSize * int64(tc.size))
-			nlocal := tc.size/2
-			nremote := tc.size/2
+			nlocal := 0
+			nremote := tc.size
 			ncommon := tc.size
 			ncw := 0
 			var nextId uint64
@@ -97,8 +97,8 @@ func TestEncodeAndDecode(t *testing.T) {
 	remote := make(map[uint64]struct{})
 
 	var nextId uint64
-	nlocal := 200000/2
-	nremote := 200000/2
+	nlocal := 0
+	nremote := 200000
 	ncommon := 200000
 	for i := 0; i < nlocal; i++ {
 		s := newTestSymbol(nextId)

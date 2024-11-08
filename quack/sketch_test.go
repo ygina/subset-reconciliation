@@ -5,14 +5,17 @@ import (
 	"math/rand"
 )
 
-func BenchmarkSketchAddSymbol(b *testing.B) {
+func BenchmarkQuackEncode(b *testing.B) {
 	benches := []struct {
 		name string
 		size int
 	}{
 		{"m=10", 10},
 		{"m=20", 20},
-		{"m=100", 100},
+		{"m=40", 40},
+		{"m=80", 80},
+		{"m=160", 160},
+		{"m=320", 320},
 		{"m=1000", 1000},
 		{"m=10000", 10000},
 		{"m=100000", 100000},
@@ -30,7 +33,7 @@ func BenchmarkSketchAddSymbol(b *testing.B) {
 	}
 }
 
-func BenchmarkFixedEncodeAndDecode(bc *testing.B) {
+func BenchmarkQuackDecode(bc *testing.B) {
 	cases := []struct {
 		name string
 		size int
@@ -38,7 +41,9 @@ func BenchmarkFixedEncodeAndDecode(bc *testing.B) {
 		{"d=10", 10},
 		{"d=20", 20},
 		{"d=40", 40},
-		{"d=100", 100},
+		{"d=80", 80},
+		{"d=160", 160},
+		{"d=320", 320},
 		{"d=1000", 1000},
 		{"d=10000", 10000},
 		// {"d=50000", 50000},

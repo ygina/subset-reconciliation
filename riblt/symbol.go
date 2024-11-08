@@ -30,6 +30,7 @@
 package riblt
 
 type HashType = uint64
+const HashTypeSize int64 = 8
 
 // Symbol is the interface that source symbols (set elements being reconciled)
 // should implement. It specifies a Boolean group, where type T (or its subset)

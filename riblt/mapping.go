@@ -10,7 +10,7 @@ import (
 // random initial PRNG state, index i will be present in the generated sequence
 // with probability 1/(1+i/2), for any non-negative i.
 type randomMapping struct {
-	prng    uint64 // PRNG state
+	prng    HashType // PRNG state
 	lastIdx uint64 // the last index the symbol was mapped to
 }
 
@@ -18,8 +18,8 @@ type randomMapping struct {
 func (s *randomMapping) nextIndex() uint64 {
 	// Update the PRNG. TODO: prove that the following update rule gives us
 	// high quality randomness, assuming the multiplier is coprime to 2^64.
-	r := s.prng * 0xda942042e4dd58b5
-	s.prng = r
+	r := uint64(s.prng) * 0xda942042e4dd58b5
+	s.prng = uint32(r)
 	// Calculate the difference from the current index (s.lastIdx) to the next
 	// index. See the paper for details. We use the approximated form
 	//   diff = (1.5+i)((1-u)^(-1/2)-1)

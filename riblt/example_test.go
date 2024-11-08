@@ -9,7 +9,7 @@ import (
 
 // item is the type of set elements we will reconcile. It implements
 // riblt.Symbol.
-type item uint64
+type item uint32
 
 // XOR implements the group operation. It is simply the bitwise exclusive-or of
 // the operands.
@@ -18,10 +18,12 @@ func (t item) XOR(t2 item) item {
 }
 
 // Hash hashes t using SipHash.
-func (t item) Hash() uint64 {
+func (t item) Hash() uint32 {
 	buf := [8]byte{}
 	binary.LittleEndian.PutUint64(buf[0:8], uint64(t))
-	return siphash.Hash(123, 456, buf[:])
+	hash64 := siphash.Hash(123, 456, buf[:])
+	hash32 := uint32(hash64 & 0xFFFFFFFF)
+	return hash32
 }
 
 func Example() {
@@ -61,5 +63,5 @@ func Example() {
 	// Output:
 	// 2 elements exclusive to Alice
 	// 0 elements exclusive to Bob
-	// 2 coded symbols sent
+	// 3 coded symbols sent
 }

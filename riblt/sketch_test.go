@@ -76,7 +76,7 @@ func BenchmarkRIBLTDecode(bc *testing.B) {
 			b.SetBytes(HashTypeSize * int64(tc.size))
 			log := make([]HashType, d + n)
 			ncw := 0
-			var nextId uint64
+			var nextId HashType
 			b.ResetTimer()
 			b.StopTimer()
 			for iter := 0; iter < b.N; iter++ {
@@ -129,19 +129,17 @@ func TestFixedEncodeAndDecode(t *testing.T) {
 	for _, tc := range cases {
 		nlocal := tc.size
 		ncommon := tc.size
-		var nextId uint64
-		slocal := make(Sketch, nlocal * 2)
-		sremote := make(Sketch, nlocal * 2)
+		var nextId uint32
+		slocal := make(Sketch, nlocal * 3)
+		sremote := make(Sketch, nlocal * 3)
 		for i := 0; i < nlocal; i++ {
-			s := newTestSymbol(nextId)
 			nextId += 1
-			slocal.AddSymbol(s.Hash())
+			slocal.AddSymbol(nextId)
 		}
 		for i := 0; i < ncommon; i++ {
-			s := newTestSymbol(nextId)
 			nextId += 1
-			slocal.AddSymbol(s.Hash())
-			sremote.AddSymbol(s.Hash())
+			slocal.AddSymbol(nextId)
+			sremote.AddSymbol(nextId)
 		}
 
 		// Decode

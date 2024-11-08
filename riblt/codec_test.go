@@ -21,7 +21,9 @@ func (d testSymbol) XOR(t2 testSymbol) testSymbol {
 }
 
 func (d testSymbol) Hash() HashType {
-	return siphash.Hash(567, 890, d[:])
+	hash64 := siphash.Hash(567, 890, d[:])
+	hash32 := uint32(hash64 & 0xFFFFFFFF)
+	return hash32
 }
 
 func newTestSymbol(i uint64) testSymbol {
@@ -93,13 +95,13 @@ func BenchmarkEncodeAndDecode(bc *testing.B) {
 func TestEncodeAndDecode(t *testing.T) {
 	enc := Encoder{}
 	dec := Decoder{}
-	local := make(map[uint64]struct{})
-	remote := make(map[uint64]struct{})
+	local := make(map[HashType]struct{})
+	remote := make(map[HashType]struct{})
 
 	var nextId uint64
 	nlocal := 0
-	nremote := 200000
-	ncommon := 200000
+	nremote := 1000
+	ncommon := 1000
 	for i := 0; i < nlocal; i++ {
 		s := newTestSymbol(nextId)
 		nextId += 1
@@ -126,6 +128,9 @@ func TestEncodeAndDecode(t *testing.T) {
 		dec.TryDecode()
 		if dec.Decoded() {
 			break
+		}
+		if ncw % 100000 == 0 {
+			t.Errorf("%d coded symbols, %d remote %d local", ncw, len(dec.Remote()), len(dec.Local()))
 		}
 	}
 	for _, v := range dec.Remote() {

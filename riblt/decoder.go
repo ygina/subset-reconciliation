@@ -26,35 +26,26 @@ func (d *Decoder) Decoded() bool {
 
 // Local returns the list of source symbols that are present in B but not in A.
 func (d *Decoder) Local() []HashType {
-	hashes := make([]HashType, len(d.local.symbols))
-	for i, v := range d.local.symbols {
-		hashes[i] = v.Hash
-	}
-	return hashes
+	return d.local.symbols
 }
 
 // Remote returns the list of source symbols that are present in A but not in B.
 func (d *Decoder) Remote() []HashType {
-	hashes := make([]HashType, len(d.remote.symbols))
-	for i, v := range d.remote.symbols {
-		hashes[i] = v.Hash
-	}
-	return hashes
+	return d.remote.symbols
 }
 
 // AddSymbol adds a source symbol to B, the Decoder's local set. It is
 // undefined behavior to call AddSymbol after AddCodedSymbol has been called
 // one or multiple times.
 func (d *Decoder) AddSymbol(s HashType) {
-	th := HashedSymbol{s}
-	d.AddHashedSymbol(th)
+	d.AddHash(s)
 }
 
-// AddHashedSymbol adds a source symbol to B, the Decoder's local set. It is
-// undefined behavior to call AddHashedSymbol after AddCodedSymbol has been
+// AddHash adds a source symbol to B, the Decoder's local set. It is
+// undefined behavior to call AddHash after AddCodedSymbol has been
 // called one or multiple times.
-func (d *Decoder) AddHashedSymbol(s HashedSymbol) {
-	d.window.addHashedSymbol(s)
+func (d *Decoder) AddHash(s HashType) {
+	d.window.addHash(s)
 }
 
 // AddCodedSymbol passes the next coded symbol in A's sequence to the Decoder.
@@ -76,8 +67,8 @@ func (d *Decoder) AddCodedSymbol(c CodedSymbol) {
 	return
 }
 
-func (d *Decoder) applyNewSymbol(t HashedSymbol, direction int64) randomMapping {
-	m := randomMapping{t.Hash, 0}
+func (d *Decoder) applyNewSymbol(t HashType, direction int64) randomMapping {
+	m := randomMapping{t, 0}
 	for int(m.lastIdx) < len(d.cs) {
 		cidx := int(m.lastIdx)
 		d.cs[cidx] = d.cs[cidx].apply(t, direction)
@@ -125,10 +116,9 @@ func (d *Decoder) TryDecode() {
 			// allocate a symbol and then XOR with the sum, so that we are
 			// guaranted to copy the sum whether or not the symbol interface is
 			// implemented as a pointer
-			ns := HashedSymbol{}
-			ns.Hash = c.Hash
+			ns := c.Hash
 			m := d.applyNewSymbol(ns, remove)
-			d.remote.addHashedSymbolWithMapping(ns, m)
+			d.remote.addHashWithMapping(ns, m)
 			d.decoded += 1
 		case -1:
 			panic("only handle subset reconciliation")

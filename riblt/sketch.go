@@ -7,39 +7,26 @@ package riblt
 // it has been created.
 type Sketch []CodedSymbol
 
-// AddHashedSymbol inserts source symbol t to the set of which s is a sketch.
-func (s Sketch) AddHashedSymbol(t HashedSymbol) {
-	m := randomMapping{t.Hash, 0}
+// AddSymbol inserts source symbol t to the set of which s is a sketch.
+func (s Sketch) AddSymbol(t HashType) {
+	m := randomMapping{t, 0}
 	for int(m.lastIdx) < len(s) {
 		idx := m.lastIdx
 		s[idx].Count += 1
-		s[idx].Hash ^= t.Hash
+		s[idx].Hash ^= t
 		m.nextIndex()
 	}
-}
-
-// RemoveHashedSymbol deletes source symbol t from the set of which s is a
-// sketch.
-func (s Sketch) RemoveHashedSymbol(t HashedSymbol) {
-	m := randomMapping{t.Hash, 0}
-	for int(m.lastIdx) < len(s) {
-		idx := m.lastIdx
-		s[idx].Count -= 1
-		s[idx].Hash ^= t.Hash
-		m.nextIndex()
-	}
-}
-
-// AddSymbol inserts source symbol t to the set of which s is a sketch.
-func (s Sketch) AddSymbol(t HashType) {
-	hs := HashedSymbol{t}
-	s.AddHashedSymbol(hs)
 }
 
 // RemoveSymbol deletes source symbol t from the set of which s is a sketch.
 func (s Sketch) RemoveSymbol(t HashType) {
-	hs := HashedSymbol{t}
-	s.RemoveHashedSymbol(hs)
+	m := randomMapping{t, 0}
+	for int(m.lastIdx) < len(s) {
+		idx := m.lastIdx
+		s[idx].Count -= 1
+		s[idx].Hash ^= t
+		m.nextIndex()
+	}
 }
 
 // Subtract subtracts s2 from s by modifying s in place. s and s2 must be of

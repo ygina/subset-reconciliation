@@ -59,15 +59,9 @@ type Symbol[T any] interface {
 	Hash() HashType
 }
 
-// HashedSymbol is the bundle of a symbol and its hash computed using its Hash
-// method.
-type HashedSymbol struct {
-	Hash   HashType
-}
-
 // CodedSymbol is a coded symbol produced by a Rateless IBLT encoder.
 type CodedSymbol struct {
-	HashedSymbol
+	Hash  HashType
 	Count int64
 }
 
@@ -78,8 +72,8 @@ const (
 
 // apply maps s to c and modifies the counter of c according to direction. add
 // increments the counter, and remove decrements the counter.
-func (c CodedSymbol) apply(s HashedSymbol, direction int64) CodedSymbol {
-	c.Hash ^= s.Hash
+func (c CodedSymbol) apply(s HashType, direction int64) CodedSymbol {
+	c.Hash ^= s
 	c.Count += direction
 	return c
 }

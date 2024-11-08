@@ -32,6 +32,27 @@ func BenchmarkRIBLTEncode(b *testing.B) {
 	}
 }
 
+func oneRIBLTDecode(b *testing.B, d int, n int, log []HashType, num_symbols int, time bool) bool {
+	slocal := make(Sketch, num_symbols)
+	sremote := make(Sketch, num_symbols)
+	for i := 0; i < d + n; i++ {
+		slocal.AddSymbol(log[i])
+	}
+	for i := 0; i < n; i++ {
+		sremote.AddSymbol(log[i])
+	}
+
+	if time {
+		b.StartTimer()
+	}
+	slocal.Subtract(sremote)
+	_, _, succ := slocal.Decode()
+	if time {
+		b.StopTimer()
+	}
+	return succ
+}
+
 func BenchmarkRIBLTDecode(bc *testing.B) {
 	cases := []struct {
 		name string
@@ -64,29 +85,29 @@ func BenchmarkRIBLTDecode(bc *testing.B) {
 					log[i] = nextId
 				}
 
-				multiplier := 2
+				lo := d
+				hi := 2 * lo
 				for {
-					slocal := make(Sketch, d * multiplier)
-					sremote := make(Sketch, d * multiplier)
-					for i := 0; i < d + n; i++ {
-						slocal.AddSymbol(log[i])
-					}
-					for i := 0; i < n; i++ {
-						sremote.AddSymbol(log[i])
-					}
-
-					b.StartTimer()
-					slocal.Subtract(sremote)
-					_, _, succ := slocal.Decode()
-					b.StopTimer()
+					succ := oneRIBLTDecode(b, d, n, log, hi, false)
 					if succ {
-						ncw += multiplier
 						break
 					}
-					multiplier *= 2
+					lo *= 2
+					hi *= 2
 				}
+				for lo < hi {
+					mid := (lo + hi) / 2
+					succ := oneRIBLTDecode(b, d, n, log, mid, false)
+					if succ {
+						hi = mid
+					} else {
+						lo = mid + 1
+					}
+				}
+				oneRIBLTDecode(b, d, n, log, lo, true)
+				ncw += lo
 			}
-			b.ReportMetric(float64(ncw)/float64(b.N), "symbols/diff")
+			b.ReportMetric(float64(ncw)/float64(b.N * d), "symbols/diff")
 		})
 	}
 }

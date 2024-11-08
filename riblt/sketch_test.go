@@ -76,6 +76,8 @@ func BenchmarkRIBLTDecode(bc *testing.B) {
 			b.SetBytes(HashTypeSize * int64(tc.size))
 			log := make([]HashType, d + n)
 			ncw := 0
+			nsucc2x := 0
+			nsucc4x := 0
 			var nextId HashType
 			b.ResetTimer()
 			b.StopTimer()
@@ -106,8 +108,16 @@ func BenchmarkRIBLTDecode(bc *testing.B) {
 				}
 				oneRIBLTDecode(b, d, n, log, lo, true)
 				ncw += lo
+				if lo <= 2 * d {
+					nsucc2x += 1
+				}
+				if lo <= 4 * d {
+					nsucc4x += 1
+				}
 			}
 			b.ReportMetric(float64(ncw)/float64(b.N * d), "symbols/diff")
+			b.ReportMetric(float64(nsucc2x)/float64(b.N), "succ@2x")
+			b.ReportMetric(float64(nsucc4x)/float64(b.N), "succ@4x")
 		})
 	}
 }
